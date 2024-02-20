@@ -16,6 +16,12 @@ type todoHandler struct {
 	todoService service.TodoService
 }
 
+func NewTodoHandler(service service.TodoService) TodoHandler {
+	return &todoHandler{
+		todoService: service,
+	}
+}
+
 func (t *todoHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	taskNew := model.TODO{}
 	err := pkg.DecodeJsonReq(r, &taskNew)

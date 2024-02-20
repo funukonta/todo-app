@@ -19,6 +19,12 @@ type todoRepo struct {
 	db *sqlx.DB
 }
 
+func NewPostgres(db *sqlx.DB) TodoRepo {
+	return &todoRepo{
+		db: db,
+	}
+}
+
 func (t *todoRepo) CreateTask(task *model.TODO) (*model.TODO, error) {
 	query := `INSERT into taks (taskname,duedate,priority,status) values 
 	($1,$2,$3,$4)

@@ -13,6 +13,12 @@ type todoService struct {
 	todoRepo repository.TodoRepo
 }
 
+func NewTodoService(repo repository.TodoRepo) TodoService {
+	return &todoService{
+		todoRepo: repo,
+	}
+}
+
 func (t *todoService) CreateTask(task *model.TODO) (*model.TODO, error) {
 	taskNew := model.TODO{
 		TaskName: task.TaskName,
