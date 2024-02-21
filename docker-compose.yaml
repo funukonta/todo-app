@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: some-postgres
+    environment:
+      POSTGRES_PASSWORD: password1
+    networks:
+      - network_todo
+
+  todo-app-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - network_todo
+    depends_on:
+      - postgres
+
+networks:
+  network_todo:
+    driver: bridge
