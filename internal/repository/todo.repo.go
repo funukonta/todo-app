@@ -83,7 +83,7 @@ func (t *todoRepo) GetTasks() ([]model.Todo, error) {
 
 func (t *todoRepo) UpdateTask(taksUpdate *model.Todo) (*model.Todo, error) {
 	query := `UPDATE tasks set taskname=$1,description=$2,duedate=$3,priority=$4,status=$5,updatedat=now() where id=$6
-	returning RETURNING id,taskname,description,duedate,priority,status,updatedat`
+	RETURNING id,taskname,description,duedate,priority,status,updatedat`
 
 	tx, err := t.db.BeginTxx(context.Background(), nil)
 	if err != nil {
@@ -99,7 +99,7 @@ func (t *todoRepo) UpdateTask(taksUpdate *model.Todo) (*model.Todo, error) {
 		taksUpdate.Priority,
 		taksUpdate.Status,
 		taksUpdate.Id,
-	).Scan(updatedTask)
+	).StructScan(updatedTask)
 	if err != nil {
 		return nil, err
 	}
