@@ -3,11 +3,11 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/funukonta/todo-app/internal/model"
 	"github.com/funukonta/todo-app/internal/service"
 	"github.com/funukonta/todo-app/pkg"
+	"github.com/gorilla/mux"
 )
 
 type TodoHandler interface {
@@ -72,8 +72,8 @@ func (t *todoHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *todoHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	idStr := parts[len(parts)-1]
+
+	idStr := mux.Vars(r)["id"]
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
