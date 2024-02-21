@@ -11,14 +11,14 @@ import (
 func ConnectPostgre() (*sqlx.DB, error) {
 
 	host := os.Getenv("PGHOST")
-	port := os.Getenv("PGPORT")
 	user := os.Getenv("PGUSER")
 	password := os.Getenv("PGPASSWORD")
 	dbName := os.Getenv("PGDATABASE")
+	ssl := "disable"
 
-	config := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable port=%s", host, user, password, dbName, port)
+	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=%s", user, password, host, dbName, ssl)
 
-	db, err := sqlx.Connect("postgres", config)
+	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
