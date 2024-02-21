@@ -26,8 +26,8 @@ func NewRepoPostgres(db *sqlx.DB) TodoRepo {
 }
 
 func (t *todoRepo) CreateTask(task *model.Todo) (*model.Todo, error) {
-	query := `INSERT into tasks (taskname,desc,duedate,priority,status) values ($1,$2,$3,$4,$5)
-	RETURNING id,taskname,desc,duedate,priority,status,createdat`
+	query := `INSERT into tasks (taskname,description,duedate,priority,status) values ($1,$2,$3,$4,$5)
+	RETURNING id,taskname,description,duedate,priority,status,createdat`
 
 	tx, err := t.db.BeginTxx(context.Background(), nil)
 	if err != nil {
@@ -56,7 +56,7 @@ func (t *todoRepo) CreateTask(task *model.Todo) (*model.Todo, error) {
 }
 
 func (t *todoRepo) GetTasks() ([]model.Todo, error) {
-	query := `select * from tasks order by duedate desc`
+	query := `select * from tasks order by duedate desc;`
 
 	rows, err := t.db.Queryx(query)
 	if err != nil {
@@ -82,8 +82,8 @@ func (t *todoRepo) GetTasks() ([]model.Todo, error) {
 }
 
 func (t *todoRepo) UpdateTask(taksUpdate *model.Todo) (*model.Todo, error) {
-	query := `UPDATE tasks set taskname=$1,desc=$2,duedate=$3,priority=$4,status=$5,updatedat=now() where id=$6
-	returning RETURNING id,taskname,desc,duedate,priority,status,updatedat`
+	query := `UPDATE tasks set taskname=$1,description=$2,duedate=$3,priority=$4,status=$5,updatedat=now() where id=$6
+	returning RETURNING id,taskname,description,duedate,priority,status,updatedat`
 
 	tx, err := t.db.BeginTxx(context.Background(), nil)
 	if err != nil {

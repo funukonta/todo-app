@@ -10,6 +10,7 @@ import (
 	"github.com/funukonta/todo-app/internal/repository"
 	"github.com/funukonta/todo-app/internal/service"
 	"github.com/funukonta/todo-app/pkg"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -21,7 +22,7 @@ func main() {
 		log.Fatal("Error load .env" + err.Error())
 	}
 
-	db, err := pkg.ConnectPostgre()
+	db := pkg.NewPostgreDB()
 	if err != nil {
 		log.Println(err)
 	}
@@ -30,11 +31,14 @@ func main() {
 	service := service.NewTodoService(repo)
 	handler := handler.NewTodoHandler(service)
 
-	mux := http.NewServeMux()
+	mux := mux.NewRouter()
 
-	mux.HandleFunc("/todo", handler.CreateTask)
+	mux.HandleFunc("/todo", handler.CreateTask).Methods("POST")
+	mux.HandleFunc("/todo", handler.GetTasks).Methods("GET")
+	mux.HandleFunc("/todo", handler.UpdateTask).Methods("PUT")
+	mux.HandleFunc("/todo", handler.DeleteTask).Methods("DELETE")
 
-	port := ":" + os.Getenv("PORT")
+	port := os.Getenv("SERVER_PORT")
 	log.Println("Server Start at :", port)
 	err = http.ListenAndServe(port, mux)
 	if err != nil {

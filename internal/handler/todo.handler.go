@@ -32,6 +32,7 @@ func (t *todoHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	err := pkg.DecodeJsonReq(r, taskReq)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	taskDB, err := t.service.CreateTask(taskReq)
@@ -45,10 +46,11 @@ func (t *todoHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 func (t *todoHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	result, err := t.service.GetTasks()
 	if err != nil {
-		pkg.JsonErr(w, http.StatusBadRequest, err)
+		pkg.WriteJson(w, http.StatusBadRequest, pkg.MsgError{Error: err})
+		return
 	}
 
-	pkg.JsonOK(w, http.StatusOK, "Berhasil ambil data", result)
+	pkg.WriteJson(w, http.StatusOK, pkg.MsgOk{Data: result, Message: "Berhasil"})
 }
 
 func (t *todoHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
