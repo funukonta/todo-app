@@ -36,7 +36,7 @@ func main() {
 	mux.HandleFunc("/todo", handler.CreateTask).Methods("POST")
 	mux.HandleFunc("/todo", handler.GetTasks).Methods("GET")
 	mux.HandleFunc("/todo", handler.UpdateTask).Methods("PUT")
-	mux.HandleFunc("/todo", handler.DeleteTask).Methods("DELETE")
+	mux.HandleFunc("/todo/{id}", handler.DeleteTask).Methods("DELETE")
 
 	port := os.Getenv("SERVER_PORT")
 	log.Println("Server Start at :", port)
