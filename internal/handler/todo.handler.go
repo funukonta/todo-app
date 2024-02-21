@@ -38,6 +38,7 @@ func (t *todoHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	taskDB, err := t.service.CreateTask(taskReq)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	pkg.JsonOK(w, http.StatusOK, "Berhasil buat task", taskDB)
@@ -58,11 +59,13 @@ func (t *todoHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	err := pkg.DecodeJsonReq(r, req)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	result, err := t.service.UpdateTask(req)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	pkg.JsonOK(w, http.StatusOK, "Berhasil update", result)
@@ -75,11 +78,13 @@ func (t *todoHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	err = t.service.DeleteTask(id)
 	if err != nil {
 		pkg.JsonErr(w, http.StatusBadRequest, err)
+		return
 	}
 
 	pkg.JsonOK(w, http.StatusBadRequest, "Berhasil delete", nil)
