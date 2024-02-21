@@ -2,6 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/funukonta/todo-app/internal/model"
 	"github.com/funukonta/todo-app/internal/service"
@@ -9,30 +11,74 @@ import (
 )
 
 type TodoHandler interface {
-	CreateTask(http.ResponseWriter, *http.Request)
+	CreateTask(w http.ResponseWriter, r *http.Request)
+	GetTasks(w http.ResponseWriter, r *http.Request)
+	UpdateTask(w http.ResponseWriter, r *http.Request)
+	DeleteTask(w http.ResponseWriter, r *http.Request)
 }
 
 type todoHandler struct {
-	todoService service.TodoService
+	service service.TodoService
 }
 
 func NewTodoHandler(service service.TodoService) TodoHandler {
 	return &todoHandler{
-		todoService: service,
+		service: service,
 	}
 }
 
 func (t *todoHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
-	taskNew := model.TODO{}
-	err := pkg.DecodeJsonReq(r, &taskNew)
+	taskReq := &model.Todo{}
+	err := pkg.DecodeJsonReq(r, taskReq)
 	if err != nil {
-		pkg.WriteErrorJson(w, http.StatusBadRequest, err)
+		pkg.JsonErr(w, http.StatusBadRequest, err)
 	}
 
-	taskInserted, err := t.todoService.CreateTask(&taskNew)
+	taskDB, err := t.service.CreateTask(taskReq)
 	if err != nil {
-		pkg.WriteErrorJson(w, http.StatusExpectationFailed, err)
+		pkg.JsonErr(w, http.StatusBadRequest, err)
 	}
 
-	pkg.WriteSuccessJson(w, http.StatusOK, taskInserted, "Berhasil Insert")
+	pkg.JsonOK(w, http.StatusOK, "Berhasil buat task", taskDB)
+}
+
+func (t *todoHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
+	result, err := t.service.GetTasks()
+	if err != nil {
+		pkg.JsonErr(w, http.StatusBadRequest, err)
+	}
+
+	pkg.JsonOK(w, http.StatusOK, "Berhasil ambil data", result)
+}
+
+func (t *todoHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	req := &model.Todo{}
+	err := pkg.DecodeJsonReq(r, req)
+	if err != nil {
+		pkg.JsonErr(w, http.StatusBadRequest, err)
+	}
+
+	result, err := t.service.UpdateTask(req)
+	if err != nil {
+		pkg.JsonErr(w, http.StatusBadRequest, err)
+	}
+
+	pkg.JsonOK(w, http.StatusOK, "Berhasil update", result)
+}
+
+func (t *todoHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(r.URL.Path, "/")
+	idStr := parts[len(parts)-1]
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		pkg.JsonErr(w, http.StatusBadRequest, err)
+	}
+
+	err = t.service.DeleteTask(id)
+	if err != nil {
+		pkg.JsonErr(w, http.StatusBadRequest, err)
+	}
+
+	pkg.JsonOK(w, http.StatusBadRequest, "Berhasil delete", nil)
 }

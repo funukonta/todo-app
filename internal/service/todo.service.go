@@ -6,31 +6,37 @@ import (
 )
 
 type TodoService interface {
-	CreateTask(*model.TODO) (*model.TODO, error)
+	CreateTask(*model.Todo) (*model.Todo, error)
+	GetTasks() ([]model.Todo, error)
+	UpdateTask(taksUpdate *model.Todo) (*model.Todo, error)
+	DeleteTask(id int) error
 }
 
 type todoService struct {
-	todoRepo repository.TodoRepo
+	repo repository.TodoRepo
 }
 
 func NewTodoService(repo repository.TodoRepo) TodoService {
 	return &todoService{
-		todoRepo: repo,
+		repo: repo,
 	}
 }
 
-func (t *todoService) CreateTask(task *model.TODO) (*model.TODO, error) {
-	taskNew := model.TODO{
-		TaskName: task.TaskName,
-		DueDate:  task.DueDate,
-		Priority: task.Priority,
-		Status:   false,
-	}
+func (t *todoService) CreateTask(task *model.Todo) (*model.Todo, error) {
+	task.Status = false
+	return t.repo.CreateTask(task)
 
-	taskInserted, err := t.todoRepo.CreateTask(&taskNew)
-	if err != nil {
-		return nil, err
-	}
+}
 
-	return taskInserted, nil
+func (t *todoService) GetTasks() ([]model.Todo, error) {
+	return t.repo.GetTasks()
+}
+
+func (t *todoService) UpdateTask(taksUpdate *model.Todo) (*model.Todo, error) {
+	return t.repo.UpdateTask(taksUpdate)
+
+}
+
+func (t *todoService) DeleteTask(id int) error {
+	return t.repo.DeleteTask(id)
 }
