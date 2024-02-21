@@ -2,39 +2,40 @@ package pkg
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
-// DecodeJsonReq to decode from Request body
+// DecodeJsonReq to decode from json in body request to object (struct/map)
 func DecodeJsonReq(r *http.Request, v any) error {
 	err := json.NewDecoder(r.Body).Decode(v)
 	defer r.Body.Close()
 	return err
 }
 
-// WriteJsonRes to encode object (struct or map) to json format
-func WriteJson(w http.ResponseWriter, statusCode int, v any) error {
+func WriteJson(w http.ResponseWriter, statusCode int, v any) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	return json.NewEncoder(w).Encode(v)
-}
-
-type MsgSuccess struct {
-	Data    any    `json:"data,omitempty"`
-	Message string `json:"message"`
-}
-
-// WriteSuccessJson to write json on success
-func WriteSuccessJson(w http.ResponseWriter, statuscode int, v any, pesan string) {
-	WriteJson(w, statuscode, MsgSuccess{Data: v, Message: pesan})
+	err := json.NewEncoder(w).Encode(v)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 type MsgError struct {
 	Error error `json:"error"`
 }
 
-// WriteErrorJson to write json on Error
-func WriteErrorJson(w http.ResponseWriter, statuscode int, err error) {
-	WriteJson(w, statuscode, MsgError{Error: err})
+type MsgOk struct {
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
+}
+
+func JsonErr(w http.ResponseWriter, statusCode int, err error) {
+	WriteJson(w, statusCode, MsgError{Error: err})
+}
+
+func JsonOK(w http.ResponseWriter, statusCode int, message string, v any) {
+	WriteJson(w, statusCode, MsgOk{Data: v, Message: message})
 }
